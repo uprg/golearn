@@ -68,6 +68,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type User struct {
+	Name string `json:"name"`
+	Age  int    `json:"age"`
+}
+
 func main() {
 	r := gin.Default() // creates a router with default middleware (logger, recovery)
 
@@ -75,6 +80,32 @@ func main() {
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
+		})
+	})
+
+	r.GET("/user/:name", func(c *gin.Context) {
+		name := c.Param("name")
+		c.JSON(200, gin.H{"user": name})
+	})
+
+	r.GET("/search", func(c *gin.Context) {
+		term := c.Query("term")
+		c.JSON(200, gin.H{"search": term})
+	})
+
+	r.POST("/user", func(c *gin.Context) {
+		var user User
+
+		// Bind JSON to struct
+		if err := c.BindJSON(&user); err != nil {
+			c.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Do something with user
+		c.JSON(200, gin.H{
+			"status": "ok",
+			"user":   user,
 		})
 	})
 
